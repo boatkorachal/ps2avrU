@@ -10,7 +10,7 @@
 ###### BLOCK 1) define some variables based on the AVR base path in $(AVR) #######
 
 	CC	= avr-gcc
-	AS	= avr-gcc -x assembler-with-cpp	
+	AS	= avr-gcc -x assembler-with-cpp
 	RM	= rm -f
 	RN	= mv
 	CP	= cp
@@ -21,24 +21,25 @@
 
 ###### BLOCK 2) output format can be srec, ihex (avrobj and bin are always created) #######
 
-	FORMAT = ihex	
+	FORMAT = ihex
 
 ###### BLOCK 3) define all project specific object files ######
 
 	SRC	+= $(addprefix $(AVRLIB)/,$(AVRLIB_SRC))
-	OBJ	= $(ASRC:.s=.o) $(SRC:.c=.o) 
+	OBJ	= $(ASRC:.s=.o) $(SRC:.c=.o)
 	CPFLAGS += -mmcu=$(MCU)
 	ASFLAGS += -mmcu=$(MCU)
 	LDFLAGS += -mmcu=$(MCU)
 
 ###### BLOCK 4) this defines the aims of the make process ######
 
-all:	$(TRG).elf $(TRG).cof $(TRG).bin $(TRG).hex $(TRG).eep $(TRG).ok
+# all:	$(TRG).elf $(TRG).cof $(TRG).bin $(TRG).hex $(TRG).eep $(TRG).ok
+all:	$(TRG).elf $(TRG).cof $(TRG).hex $(TRG).ok
 
 
 ###### BLOCK 5) compile: instructions to create assembler and/or object files from C source ######
 
-%.o : %.c 
+%.o : %.c
 	$(CC) -c $(CPFLAGS) -I$(INCDIR) $< -o $@
 
 %.s : %.c
@@ -85,7 +86,7 @@ all:	$(TRG).elf $(TRG).cof $(TRG).bin $(TRG).hex $(TRG).eep $(TRG).ok
 
 %ok:
 	$(SIZE) $(TRG).elf
-	@echo "Errors: none" 
+	@echo "Errors: none"
 
 
 ###### BLOCK 11)  make instruction to delete created files ######
@@ -104,7 +105,7 @@ clean:
 	$(RM) $(TRG).hex
 	$(RM) $(TRG).bin
 	@echo "Errors: none"
-	
+
 size:
 	$(SIZE) $(TRG).elf
 

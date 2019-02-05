@@ -90,7 +90,7 @@ static void putChangedKey(uint8_t xKeyidx, bool xIsDown, uint8_t xCol, uint8_t x
 
     setDualAction(xKeyidx, xIsDown);
 
-    // 듀얼 액션 키 자체로 버퍼에 저장하면?
+    // Dual action keys stored in the buffer itself?
     pushDownBuffer(xKeyidx, xIsDown);
 
     if(xIsDown){
@@ -100,7 +100,7 @@ static void putChangedKey(uint8_t xKeyidx, bool xIsDown, uint8_t xCol, uint8_t x
     // 퀵매크로 레코딩...
     // isKeyMapping()을 쓰면 ps2에서 눌렸던 키들이 복귀 되지 않는다.
     if(isQuickMacro()){
-        
+
         xKeyidx = putKeyindex(xKeyidx, xCol, xRow, xIsDown);
 
         if(xKeyidx == KEY_NONE) return;
@@ -110,7 +110,7 @@ static void putChangedKey(uint8_t xKeyidx, bool xIsDown, uint8_t xCol, uint8_t x
     if(gFN == false) return;
 
     if(isFnKey(xKeyidx)) return;
-            
+
     if(xIsDown && applyMacro(xKeyidx)) {
         // 매크로 실행됨;
         return;
@@ -119,7 +119,7 @@ static void putChangedKey(uint8_t xKeyidx, bool xIsDown, uint8_t xCol, uint8_t x
     xKeyidx = getDualActionDownKeyIndexWhenIsCompounded(xKeyidx, false);
 
     sendKeyCodeWhenChange(xKeyidx, xIsDown);
-	
+
 }
 
 static uint8_t processKeyIndex(uint8_t xLayer, bool xPrev, bool xCur, uint8_t xCol, uint8_t xRow ){
@@ -182,21 +182,21 @@ void scanKeyWithMacro(void){
     macro_key_t gKey;
     if(isActiveMacro()){
         if(!isEmptyMacroKeyIndex()){
-          
+
             gKey = popMacroKey();
 
             if(gKey.mode == MACRO_KEY_DOWN){    // down
                 sendKeyCodeWhenChange(gKey.keyindex, true);
-                
+
             }else{  // up
                 // 모디키가 눌려져 있다면 그 상태를 유지;
                 if (gKey.keyindex > KEY_Modifiers && gKey.keyindex < KEY_Modifiers_end) {
-                    if(getModifierDownBuffer() & getModifierBit(gKey.keyindex)){                     
+                    if(getModifierDownBuffer() & getModifierBit(gKey.keyindex)){
                         goto PASS_MODI;
                     }
                 }
                 sendKeyCodeWhenChange(gKey.keyindex, false);
-             
+
             }
         }
 
@@ -208,7 +208,7 @@ PASS_MODI:
 }
 
 static void scanKeyWithDebounce(void) {
-    
+
     // debounce cleared and changed
     if(!setCurrentMatrix()) return;
 
@@ -219,7 +219,7 @@ static void scanKeyWithDebounce(void) {
 
     uint8_t *gMatrix = getCurrentMatrix();
     uint8_t *gPrevMatrix = getPrevMatrix();
-	for (row = 0; row < ROWS; ++row) { // check every bit on this row   
+	for (row = 0; row < ROWS; ++row) { // check every bit on this row
         if(gPrevMatrix[row] == 0 && gMatrix[row] == 0) continue;
         for (col = 0; col < COLUMNS; ++col) { // process all rows for key-codes
 

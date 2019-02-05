@@ -27,7 +27,7 @@ static bool isCompounded(void)
 
 void enterFrameForDualAction(void){
 	/*
-	 * 듀얼액션 키가 눌려진 상태로 일정 시간 (약 0.5초?)이 유지되면 일반키가 조합되지 않아도 조합 키로 적용
+	 * If a dual action key is pressed and held for a certain period of time (about 0.5 second?), It is applied as a combination key
 	 */
 //	if(dualActionKeyIndex > 0 && ++_autoDownCount > 500){
 	if(dualActionKeyIndex > 0 && _isCompounded == false && ++_autoDownCount > 500){
@@ -40,8 +40,8 @@ void enterFrameForDualAction(void){
 void applyDualActionDownWhenIsCompounded(void){
 
 	if(dualActionKeyIndex > 0 && isCompounded() && false == _alreadyActioned){
-        // 다른 키와 조합되었을 때 우선 듀얼액션키의 조합 키코드 값을 버퍼에 저장한다.
-		pushKeyCodeDecorator(getDualActionCompoundKey(dualActionKeyIndex), true);
+        // When combined with other keys, first, the combination key code value of the dual action key is stored in the buffer.
+        pushKeyCodeDecorator(getDualActionCompoundKey(dualActionKeyIndex), true);
 
         if(isQuickMacro()){
         	putKeyindex(getDualActionCompoundKey(dualActionKeyIndex), 0, 0, 1);
@@ -56,7 +56,7 @@ void applyDualActionDownWhenIsCompounded(void){
 static void applyDualActionUp(void){
 
     if(dualActionKeyIndex > 0 && !isCompounded()){
-        // 듀얼액션이 저장되어 있을 때 아무키도 눌리지 않은 리포트가 간다면 액션!
+        // If a dual action is saved, and no key is pressed, the action will take place!
        	uint8_t gUpIdx = getDualActionAloneKey(dualActionKeyIndex);
         pushMacroKeyIndex(gUpIdx);
         pushMacroKeyIndex(gUpIdx);
@@ -81,7 +81,7 @@ void setDualAction(uint8_t keyidx, bool isDown){
 //    DBG1(0xF0, (uchar *)&isDown, 1);
 
     /*
-     * 첫 키(modi 제외)로 듀얼액션 키를 눌러야 작동;
+     * The first key (except modi) is activated by pressing the dual action key;
      *
      *
      */
@@ -89,24 +89,30 @@ void setDualAction(uint8_t keyidx, bool isDown){
 	if(isDown){
 //	    DBG1(0xF1, (uchar *)&keyidx, 1);
 	    IF_IS_DUAL_ACTION_KEY(keyidx) {
-			if (isReleaseAll() && dualActionKeyIndex == 0) { // 첫 키가 듀얼 액션 키로 눌린 상태;
+			if (isReleaseAll() && dualActionKeyIndex == 0) { // The first key is pressed with a dual action key;
+
 //			    DBG1(0xF1, (uchar *)&dualActionKeyIndex, 5);
 				dualActionKeyIndex = keyidx;
-				_isCompounded = false;  // 하나만 눌렸으므로 아직은 조합 상태 아님;
-			} else {
-				// 듀얼 액션 키가 2개 이상 눌려짐;
-			    /*
-			     * 첫 듀얼 액션 키만 무조건 compound키로 작동하고,
-			     * 두 번째 키들은 default키로 작동한다.
-			     */
+				_isCompounded = false;  // Since only one has been pressed, it is not yet in combination;
+			} else if (!isReleaseAll() && dualActionKeyIndex == 0) {
+                dualActionKeyIndex = keyidx;
+                _isCompounded = false;
+            } else {
+
+                // Two or more dual action keys pressed;
+                /*
+                * Only the first dual action key will act as a compound key,
+                * The second keys act as default keys.
+                */
 				_isCompounded = true;
 			}
 		} else {
-			/* 듀얼 액션 키보다 다른 키가 먼저 눌린 경우,
-		    *
-		    * 1. alone 키가 작동되는 경우;
-		    * 2. compound 키가 작동되는 경우
-		    */
+
+            /* If a key other than the dual action key is pressed first,
+            *
+            * 1. When the alone key is activated;
+            * 2. When the compound key is activated
+            */
 			_isCompounded = true;
 		}
 //        DBG1(0xF2, (uchar *)&_isActiveDualAction, 2);
@@ -146,7 +152,7 @@ uint8_t getDualActionDefaultKey(uint8_t xActionIndex){
     return xActionIndex;
 }
 
-// 키가 조합되었을 때는 조합 키코드를 적용한다.;
+// When the keys are combined, a combination key code is applied.;
 uint8_t getDualActionDownKeyIndexWhenIsCompounded(uint8_t xKeyidx, bool xForceCompounded){
 //    DBG1(0xF8, (uchar *)&xKeyidx, 2);
 //    DBG1(0xF1, (uchar *)&dualActionKeyIndex, 3);
